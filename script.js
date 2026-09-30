@@ -1,94 +1,207 @@
 // ========================================
 // TRICOTIN DA LU
-// Pequenas animações da página
+// ANIMAÇÕES E EFEITOS
 // ========================================
 
-
-// ----------------------------------------
-// ANIMAÇÃO AO ENTRAR NA TELA
-// ----------------------------------------
-
-const animatedElements = document.querySelectorAll(
-    '.category-card, .gallery-item, .about-image, .section-heading'
-);
+document.addEventListener("DOMContentLoaded", () => {
 
 
-const observer = new IntersectionObserver(
-    (entries) => {
+    // ====================================
+    // ELEMENTOS QUE APARECEM AO ROLAR
+    // ====================================
 
-        entries.forEach((entry) => {
+    const animatedElements =
+        document.querySelectorAll(
+            ".category-card, .gallery-item, .about-image, .section-heading"
+        );
 
-            if (entry.isIntersecting) {
 
-                entry.target.classList.add('show');
+    animatedElements.forEach((element) => {
 
+        element.classList.add("reveal");
+
+    });
+
+
+    const observer =
+        new IntersectionObserver(
+            (entries, observerInstance) => {
+
+                entries.forEach((entry) => {
+
+                    if (entry.isIntersecting) {
+
+                        entry.target.classList.add(
+                            "show"
+                        );
+
+                        observerInstance.unobserve(
+                            entry.target
+                        );
+
+                    }
+
+                });
+
+            },
+            {
+                threshold: 0.12
             }
-
-        });
-
-    },
-    {
-        threshold: 0.12
-    }
-);
+        );
 
 
-animatedElements.forEach((element) => {
+    animatedElements.forEach((element) => {
 
-    element.style.opacity = '0';
+        observer.observe(element);
 
-    element.style.transform =
-        'translateY(25px)';
-
-    element.style.transition =
-        'opacity .7s ease, transform .7s ease';
-
-    observer.observe(element);
-
-});
+    });
 
 
-// ----------------------------------------
-// ADICIONA A ANIMAÇÃO
-// ----------------------------------------
+    // ====================================
+    // SOMBRA DO CABEÇALHO
+    // ====================================
 
-const animationStyle = document.createElement('style');
-
-animationStyle.innerHTML = `
-
-    .show {
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-    }
-
-`;
-
-document.head.appendChild(animationStyle);
+    const header =
+        document.querySelector(".header");
 
 
-// ----------------------------------------
-// HEADER AO ROLAR
-// ----------------------------------------
+    function atualizarHeader() {
 
-const header =
-    document.querySelector('.header');
+        if (!header) {
+            return;
+        }
 
-
-window.addEventListener(
-    'scroll',
-    () => {
 
         if (window.scrollY > 40) {
 
             header.style.boxShadow =
-                '0 8px 30px rgba(100,75,75,.08)';
+                "0 8px 30px rgba(100,75,75,.08)";
 
         } else {
 
             header.style.boxShadow =
-                'none';
+                "none";
 
         }
 
     }
-);
+
+
+    window.addEventListener(
+        "scroll",
+        atualizarHeader,
+        {
+            passive: true
+        }
+    );
+
+
+    atualizarHeader();
+
+
+    // ====================================
+    // EFEITO NAS FOTOS DA GALERIA
+    // ====================================
+
+    const galleryItems =
+        document.querySelectorAll(
+            ".gallery-item"
+        );
+
+
+    galleryItems.forEach((item) => {
+
+        const image =
+            item.querySelector("img");
+
+
+        if (!image) {
+            return;
+        }
+
+
+        item.addEventListener(
+            "mousemove",
+            (event) => {
+
+                if (window.innerWidth <= 750) {
+                    return;
+                }
+
+
+                const rect =
+                    item.getBoundingClientRect();
+
+
+                const x =
+                    (
+                        event.clientX -
+                        rect.left
+                    ) / rect.width - 0.5;
+
+
+                const y =
+                    (
+                        event.clientY -
+                        rect.top
+                    ) / rect.height - 0.5;
+
+
+                image.style.transform =
+                    `scale(1.025) translate(${x * 2}px, ${y * 2}px)`;
+
+            }
+        );
+
+
+        item.addEventListener(
+            "mouseleave",
+            () => {
+
+                image.style.transform = "";
+
+            }
+        );
+
+    });
+
+
+    // ====================================
+    // TOQUE NAS FOTOS NO CELULAR
+    // ====================================
+
+    galleryItems.forEach((item) => {
+
+        item.addEventListener(
+            "touchstart",
+            () => {
+
+                galleryItems.forEach(
+                    (otherItem) => {
+
+                        if (otherItem !== item) {
+
+                            otherItem.classList.remove(
+                                "gallery-active"
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                item.classList.toggle(
+                    "gallery-active"
+                );
+
+            },
+            {
+                passive: true
+            }
+        );
+
+    });
+
+
+});
